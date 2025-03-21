@@ -100,7 +100,7 @@ public class SocketHandler extends TextWebSocketHandler {
             if (connectedUserId != null) {
                 WebSocketSession connectedSession = getSessionFromUserId(connectedUserId);
                 if (connectedSession != null && connectedSession.isOpen()) {
-                    connectedSession.sendMessage(new TextMessage( payload));
+                    connectedSession.sendMessage(new TextMessage(payload));
                     System.out.println("Message from " + senderId + " to " + connectedUserId + ": " + payload);
                 }
             }
