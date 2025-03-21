@@ -35,7 +35,7 @@ public class SocketHandler extends TextWebSocketHandler {
         System.out.println("User connected: " + session.getId());
 
         // Send the User ID to the newly connected user
-        session.sendMessage(new TextMessage("server User ID: " + userKey));
+        session.sendMessage(new TextMessage("Your User ID - " + userKey));
     }
 
     @Override
