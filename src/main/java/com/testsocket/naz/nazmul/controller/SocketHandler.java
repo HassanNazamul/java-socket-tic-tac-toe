@@ -30,7 +30,8 @@ public class SocketHandler extends TextWebSocketHandler {
         System.out.println("User connected: " + session);
 
         // Send user ID to the newly connected user
-        session.sendMessage(new TextMessage("Note your User ID: " + userKey));
+        session.sendMessage(new TextMessage(userKey));
+        System.out.println(userKey);
     }
 
     @Override
@@ -48,6 +49,7 @@ public class SocketHandler extends TextWebSocketHandler {
     public void handleMessage(WebSocketSession senderSession, WebSocketMessage<?> message) throws Exception {
         String payload = message.getPayload().toString();
         String senderId = getUserIdFromSession(senderSession);
+        System.out.println("Received color state update: " + payload);
 
         if (payload.startsWith("connect:")) {
             String receiverId = payload.substring(8).trim();
@@ -73,12 +75,14 @@ public class SocketHandler extends TextWebSocketHandler {
                 WebSocketSession connectedSession = getSessionFromUserId(connectedUserId);
                 if (connectedSession != null && connectedSession.isOpen()) {
                     // Send the message only to the connected user
-                    connectedSession.sendMessage(new TextMessage(senderId + ": " + payload));
+                    connectedSession.sendMessage(new TextMessage(payload));
                     System.out.println("Message from " + senderId + " to " + connectedUserId + ": " + payload);
                 }
             }
         }
+
     }
+
 
     // Custom method to retrieve user ID from session
     private String getUserIdFromSession(WebSocketSession session) {
