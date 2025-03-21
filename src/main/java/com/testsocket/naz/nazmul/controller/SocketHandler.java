@@ -32,10 +32,10 @@ public class SocketHandler extends TextWebSocketHandler {
         idKeyMap.put(userKey, session);
         sessionMap.put(session, userKey);
 
-        System.out.println("User connected: " + session.getId());
+        System.out.println(session.getId());
 
         // Send the User ID to the newly connected user
-        session.sendMessage(new TextMessage("Your User ID - " + userKey));
+        session.sendMessage(new TextMessage("Your User ID -" + userKey));
     }
 
     @Override
@@ -70,6 +70,36 @@ public class SocketHandler extends TextWebSocketHandler {
         return null;
     }
 
+    // Method to disconnect both users
+    private void disconnectUsers(String userId1, String userId2) {
+        // Remove the users from the connectedUsers map
+        connectedUsers.remove(userId1);
+        connectedUsers.remove(userId2);
+
+        // Get the WebSocket sessions for both users
+        WebSocketSession session1 = getSessionFromUserId(userId1);
+        WebSocketSession session2 = getSessionFromUserId(userId2);
+
+        if (session1 != null && session1.isOpen()) {
+            try {
+                System.out.println(userId1 + " and " + userId2 + " have been disconnected.");
+                session1.sendMessage(new TextMessage("You have been disconnected from " + userId2));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (session2 != null && session2.isOpen()) {
+            try {
+                System.out.println(userId1 + " and " + userId2 + " have been disconnected.");
+                session2.sendMessage(new TextMessage("You have been disconnected from " + userId1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     @Override
     public void handleMessage(WebSocketSession senderSession, WebSocketMessage<?> message) throws Exception {
         String payload = message.getPayload().toString();
@@ -94,6 +124,10 @@ public class SocketHandler extends TextWebSocketHandler {
             } else {
                 senderSession.sendMessage(new TextMessage("User " + receiverId + " not found!"));
             }
+        } else if (payload.startsWith("disconnect:")) {
+            // Handle disconnection requests
+            String receiverId = payload.substring(11).trim();
+            disconnectUsers(senderId, receiverId);
         } else {
             // Handle chat messages
             String connectedUserId = connectedUsers.get(senderId);
@@ -105,7 +139,5 @@ public class SocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-
     }
-
 }
